@@ -4,17 +4,17 @@ import './List.sass';
 const generateList = (list) => {
     return list.map(item => {
         return (
-            <div className='list' key={item.id}>
+            <div className='list__item' key={item.id}>
                 <div className='list__name'>{item.name}</div>
-                <div className='list__stars'>{item.stargazers_count} star</div>
+                <div className='list__stars'>{item.stargazers_count} stars</div>
             </div>
         );
     })
 }
 
-const List = ({ list }) => {
+const List = ({ list, loading }) => {
     return (
-        <div className='List'>
+        <div className='list'>
             {generateList(list)}
         </div>
     );

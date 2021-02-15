@@ -4,13 +4,20 @@ import './Layout.sass';
 
 import Input from 'components/input/Input';
 import List from 'components/list/List';
+import Pagination from 'components/pagination/Pagination';
 
-import { getRepos, setSearchValue } from 'redux/reducers/search';
+import { getRepos,
+         setSearchValue,
+         changePage,
+         setLoading } from 'redux/reducers/search';
 
 const Layout = () => {
     const dispatch = useDispatch();
-    const searchValue = useSelector(store => store.search.searchValue);
-    const repos = useSelector(store => store.search.repos);
+    const { searchValue,
+            repos,
+            currentPage,
+            pageItemsCount,
+            loading } = useSelector(store => store.search);
 
     const onChange = (e) => {
         dispatch(setSearchValue(e.target.value));
@@ -18,7 +25,37 @@ const Layout = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        dispatch(setLoading(true));
         dispatch(getRepos());
+    }
+
+    const onPrevPage = () => {
+        dispatch(changePage(currentPage - 1));
+    }
+
+    const onNextPage = () => {
+        dispatch(changePage(currentPage + 1));
+    }
+
+    const results = () => {
+        if (loading) {
+            return 'Loading...';
+        } else {
+            return(
+                <>
+                    {repos.items && <List list={repos.items} loading={loading} />}
+                    {repos.total_count > 30
+                                            && <Pagination
+                                                    onPrevPage={onPrevPage}
+                                                    onNextPage={onNextPage}
+                                                    currentPage={currentPage}
+                                                    totalItems={repos.total_count}
+                                                    pageItemsCount={pageItemsCount}
+                                                />}
+                </>
+            );
+            
+        }
     }
 
     return (
@@ -33,7 +70,7 @@ const Layout = () => {
                 />
             </div>
             <div className='layout__results'>
-                {repos.items && <List list={repos.items} />}
+                {results()}
             </div>
         </div>
     );
